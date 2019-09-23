@@ -16,35 +16,42 @@ class SessionController {
         .min(6),
     });
 
-    try {
-      await schema.validate(req.body, { abortEarly: false });
-      const { email, password } = req.body;
-
-      const user = await User.findOne({ where: { email } });
-
-      if (!user) {
-        return res.status(401).json({ message: 'User not found' });
-      }
-
-      if (!(await user.checkPassword(password))) {
-        return res.status(401).json({ message: 'Password does not match' });
-      }
-
-      const { id, name } = user;
-
-      return res.json({
-        user: {
-          id,
-          name,
-          email,
-        },
-        token: jwt.sign({ id }, authConfig.secret, {
-          expiresIn: authConfig.expiresIn,
-        }),
-      });
-    } catch (e) {
-      return res.status(400).json({ errors: e.errors });
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ message: 'Validation fails' });
     }
+
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ where: { email } });
+
+    /**
+     * Check if user exists
+     */
+
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    /**
+     * Check if user password matches
+     */
+
+    if (!(await user.checkPassword(password))) {
+      return res.status(401).json({ message: 'Password does not match' });
+    }
+
+    const { id, name } = user;
+
+    return res.json({
+      user: {
+        id,
+        name,
+        email,
+      },
+      token: jwt.sign({ id }, authConfig.secret, {
+        expiresIn: authConfig.expiresIn,
+      }),
+    });
   }
 }
 
