@@ -18,7 +18,7 @@ Browse to folder
 cd api-meetapp
 ```
 
-Run yarn to install dependencies
+Run this command to install dependencies
 
 ```
 yarn
