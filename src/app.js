@@ -25,15 +25,15 @@ class App {
   middleWares() {
     this.server.use(Sentry.Handlers.requestHandler());
     this.server.use(express.json());
+    this.server.use(
+      '/files',
+      express.static(path.resolve(__dirname, '..', 'tmp', 'uploads'))
+    );
   }
 
   routes() {
     this.server.use(routes);
     this.server.use(Sentry.Handlers.errorHandler());
-    this.server.use(
-      '/files',
-      express.static(path.resolve(__dirname, '..', 'tmp', 'uploads'))
-    );
   }
 
   exceptionHandler() {
